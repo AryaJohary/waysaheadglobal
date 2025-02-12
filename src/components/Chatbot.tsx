@@ -29,10 +29,15 @@ const Chatbot = () => {
         "You are an assistant for the WaysAhead Global website. Provide helpful answers based on the provided website sections: Home, Services, News, Contact, FAQs and job inquiries.\n\nUser:";
       const prompt = `${systemPrompt} ${userInput}\nAssistant:`;
       const response = await puter.ai.chat(prompt);
-      // Extract the text response based on the returned structure
       let botText = '';
-      if (response && typeof response.message === 'object' && response.message.content) {
-        botText = response.message.content;
+      if (response && typeof response.message === 'object') {
+        if (response.message.content) {
+          botText = response.message.content;
+        } else if (response.message.text) {
+          botText = response.message.text;
+        } else {
+          botText = JSON.stringify(response.message);
+        }
       } else if (typeof response.message === 'string') {
         botText = response.message;
       } else {
@@ -64,8 +69,10 @@ const Chatbot = () => {
           <div className="flex-1 p-4 overflow-y-auto max-h-60">
             {messages.map((msg, i) => (
               <div key={i} className={`mb-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
-                <span className={`inline-block px-3 py-2 rounded-lg ${msg.sender === 'user' ? 'bg-blue-600' : 'bg-gray-600'} text-white`}>
-                  {msg.text}
+                <span 
+                  className={`inline-block px-3 py-2 rounded-lg ${msg.sender === 'user' ? 'bg-blue-600' : 'bg-gray-600'} text-white`}
+                >
+                  {typeof msg.text === 'object' ? JSON.stringify(msg.text) : msg.text}
                 </span>
               </div>
             ))}
