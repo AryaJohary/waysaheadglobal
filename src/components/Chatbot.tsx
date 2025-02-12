@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { MessageSquare, X } from 'lucide-react';
 
+// Declare Puter.js global to satisfy TypeScript.
+declare const puter: any;
+
 interface ChatMessage {
   sender: 'user' | 'bot';
   text: string;
@@ -21,55 +24,25 @@ const Chatbot = () => {
     setMessages((prev) => [...prev, userMessage]);
     const userInput = input.trim();
     setInput('');
-
-    const apiKey = 'sk-ijklmnopabcd5678ijklmnopabcd5678ijklmnop';
-
-    if (!apiKey) {
-      console.error('No API key provided! Check your .env file.');
-      const errorMessage: ChatMessage = { sender: 'bot', text: 'API key missing. Please contact support.' };
-      setMessages((prev) => [...prev, errorMessage]);
-      return;
-    }
-
-    const requestBody = {
-      model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are an assistant for the WaysAhead Global website. Provide helpful answers based on the provided website sections: Home, Services, News, Contact, FAQs and job inquiries.'
-        },
-        { role: 'user', content: userInput }
-      ],
-      temperature: 0.7,
-      max_tokens: 150
-    };
-
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!response.ok) {
-        console.error('OpenAI API call failed. Status:', response.status);
-        throw new Error('Failed to fetch response from OpenAI API');
+      const systemPrompt =
+        "You are an assistant for the WaysAhead Global website. Provide helpful answers based on the provided website sections: Home, Services, News, Contact, FAQs and job inquiries.\n\nUser:";
+      const prompt = `${systemPrompt} ${userInput}\nAssistant:`;
+      const response = await puter.ai.chat(prompt);
+      // Extract the text response based on the returned structure
+      let botText = '';
+      if (response && typeof response.message === 'object' && response.message.content) {
+        botText = response.message.content;
+      } else if (typeof response.message === 'string') {
+        botText = response.message;
       } else {
-        console.log('API key is working. OpenAI API response status:', response.status);
+        botText = JSON.stringify(response);
       }
 
-      const data = await response.json();
-      const botAnswer =
-        data?.choices?.[0]?.message?.content ||
-        "I'm sorry, I didn't quite understand that.";
-      const botMessage: ChatMessage = { sender: 'bot', text: botAnswer.trim() };
+      const botMessage: ChatMessage = { sender: 'bot', text: botText };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error('Error calling OpenAI API:', error);
+      console.error('Error calling puter.ai.chat:', error);
       const botMessage: ChatMessage = {
         sender: 'bot',
         text: 'Sorry, something went wrong while processing your request.'
