@@ -3,8 +3,8 @@
 **Assignment Submission for WaysAhead Global**
 
 **Student Name:** Arya Kumar Johary  
-**Roll Number:** 12021002026028 
-**Class:** B.Tech CSE
+**Roll Number:** 12021002026028     
+**Class:** B.Tech CSE           
 **University:** University of Engineering and Management, Jaipur
 
 ## Description
