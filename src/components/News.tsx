@@ -42,7 +42,7 @@ const newsItems: NewsItem[] = [
 
 const News = () => {
   return (
-    <section className="relative bg-gray-900 overflow-hidden">
+    <section className="relative bg-gray-900 overflow-hidden" id="news">
       {/* Optional tech-pattern background overlay */}
       <div className="absolute inset-0 -z-10 bg-[url('/images/tech-pattern.png')] bg-cover bg-center opacity-10"></div>
 
